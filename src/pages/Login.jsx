@@ -6,26 +6,24 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const { loginUser } = useAuth();
   const navigate = useNavigate();
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const res = await loginApi(form);
 
     if (res.token && res.user) {
-        await loginUser({
-          token: res.token,
-          user: res.user,
-        });
+      await loginUser({
+        token: res.token,
+        user: res.user,
+      });
 
-
-
-      // STEP 3: Wait for token to be picked up by axios interceptors
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      // STEP 4: Check if profile exists
       const check = await getProfile();
 
       if (!check.profile) {
@@ -36,63 +34,80 @@ export default function Login() {
         });
       }
 
-      // STEP 5: Navigate
       navigate("/dashboard");
     } else {
       alert(res.message || "Invalid credentials");
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6 py-10">
 
-        <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">
-          Jobbyfy
-        </h1>
+      {/* Card */}
+      <div className="w-full max-w-md bg-white/60 backdrop-blur-xl shadow-xl rounded-3xl p-8 border border-white/30">
 
-        <h2 className="text-xl font-semibold mb-6 text-center">
-          Welcome Back
-        </h2>
+        {/* Logo */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-extrabold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Jobbyfy
+          </h1>
+          <p className="text-gray-600 mt-1 text-sm">Welcome back! Log in to continue.</p>
+        </div>
 
-        <form onSubmit={onSubmit} className="space-y-4">
+        {/* Form */}
+        <form onSubmit={onSubmit} className="space-y-5">
 
+          {/* Email */}
           <div>
-            <label className="text-sm font-medium">Email</label>
+            <label className="text-sm font-semibold text-gray-700">Email</label>
             <input
               type="email"
-              className="w-full mt-1 p-3 border rounded-lg focus:ring focus:ring-blue-300"
+              className="w-full mt-1 p-3 rounded-xl bg-white border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="example@gmail.com"
+              placeholder="john@example.com"
+              required
             />
           </div>
 
+          {/* Password */}
           <div>
-            <label className="text-sm font-medium">Password</label>
+            <label className="text-sm font-semibold text-gray-700">Password</label>
             <input
               type="password"
-              className="w-full mt-1 p-3 border rounded-lg focus:ring focus:ring-blue-300"
+              className="w-full mt-1 p-3 rounded-xl bg-white border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               placeholder="••••••••"
+              required
             />
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full py-3 mt-2 rounded-xl bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-md hover:shadow-lg hover:opacity-95 transition-all"
           >
-            Login
+            {loading ? "Signing in..." : "Login"}
           </button>
 
-          <p className="text-center text-sm">
-            New to Jobbyfy?{" "}
-            <Link className="text-blue-600 font-medium" to="/signup">
-              Create account
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-3">
+            <div className="flex-1 h-px bg-gray-300" />
+            <span className="text-gray-500 text-sm">or</span>
+            <div className="flex-1 h-px bg-gray-300" />
+          </div>
+
+          {/* Signup link */}
+          <p className="text-center text-sm text-gray-700">
+            New to Jobbyfy?
+            <Link to="/signup" className="ml-1 font-semibold text-blue-600 hover:underline">
+              Create an account
             </Link>
           </p>
-
         </form>
       </div>
     </div>

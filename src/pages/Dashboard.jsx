@@ -2,6 +2,8 @@ import { useAuth } from "../context/AuthContext";
 import { Link, Navigate } from "react-router-dom";
 
 export default function Dashboard() {
+  console.log("DASHBOARD MOUNTED");
+
   const { auth, logoutUser } = useAuth();
 
   // PROTECT ROUTE
@@ -24,7 +26,18 @@ export default function Dashboard() {
       <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {/* SCRAPE JOB */}
-        <button className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition">
+        <button
+          onClick={() => {
+            console.log("STEP 1: Scrape button clicked in Dashboard");
+            console.log("STEP 2: Sending SCRAPE_JOB_REQUEST_FROM_DASHBOARD to TOP window");
+
+            window.top.postMessage(
+              { type: "SCRAPE_JOB_REQUEST_FROM_DASHBOARD", source: "DASHBOARD_IFRAME" },
+              "*"
+            );
+          }}
+          className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition"
+        >
           <h2 className="text-xl font-semibold mb-2">Scrape Current Job</h2>
           <p className="text-gray-600 mb-3">Extract job details from the current tab.</p>
           <span className="text-blue-600 font-semibold">→</span>
@@ -38,14 +51,15 @@ export default function Dashboard() {
         </button>
 
         {/* SAVED JOBS */}
-        <Link
-          to="/saved-jobs"
-          className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition block"
-        >
-          <h2 className="text-xl font-semibold mb-2">Saved Jobs</h2>
-          <p className="text-gray-600 mb-3">View all scraped and saved jobs.</p>
-          <span className="text-blue-600 font-semibold">→</span>
-        </Link>
+          <Link
+            to="/jobs"
+            className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition block"
+          >
+            <h2 className="text-xl font-semibold mb-2">Saved Jobs</h2>
+            <p className="text-gray-600 mb-3">View all scraped and saved jobs.</p>
+            <span className="text-blue-600 font-semibold">→</span>
+          </Link>
+
 
         {/* PROFILE */}
         <Link
