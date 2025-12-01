@@ -1,7 +1,23 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-})
+  base: '',
+  build: {
+    outDir: path.resolve(__dirname, '../Jobbyfy extension/sidebar'),
+    emptyOutDir: true,
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'injected_bundle.js',        // JS bundle name
+        assetFileNames: (chunkInfo) => {
+          if (chunkInfo.name && chunkInfo.name.endsWith('.css')) return 'injected_style.css';
+          return 'assets/[name].[ext]';
+        }
+      }
+    }
+  }
+});
