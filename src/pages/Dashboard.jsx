@@ -1,98 +1,164 @@
 import { useAuth } from "../context/AuthContext";
 import { Link, Navigate } from "react-router-dom";
+import { useState } from "react";
+import {
+  Squares2X2Icon,
+  DocumentMagnifyingGlassIcon,
+  RocketLaunchIcon,
+  BookmarkIcon,
+  UserCircleIcon,
+  ClipboardDocumentCheckIcon,
+  PencilSquareIcon,
+  ArrowRightOnRectangleIcon
+} from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
-  console.log("DASHBOARD MOUNTED");
-
+  const [jobData, setJobData] = useState(null);
   const { auth, logoutUser } = useAuth();
 
-  // PROTECT ROUTE
   if (!auth?.token) return <Navigate to="/login" />;
 
+  const menu = [
+    {
+      label: "Scrape Current Job",
+      desc: "Extract job details from the current tab.",
+      icon: DocumentMagnifyingGlassIcon,
+      onClick: () => {
+        window.top.postMessage(
+          {
+            type: "SCRAPE_JOB_REQUEST_FROM_DASHBOARD",
+            source: "DASHBOARD_IFRAME",
+          },
+          "*"
+        );
+      },
+    },
+    {
+      label: "Auto Apply",
+      desc: "Automatically fill job applications.",
+      icon: RocketLaunchIcon,
+      onClick: () => {},
+    },
+    {
+      label: "Saved Jobs",
+      desc: "View all scraped and saved jobs.",
+      icon: BookmarkIcon,
+      link: "/jobs",
+    },
+    {
+      label: "Profile",
+      desc: "Edit your profile & details.",
+      icon: UserCircleIcon,
+      link: "/profile",
+    },
+    {
+      label: "Resume Score",
+      desc: "Check match score for your resume.",
+      icon: ClipboardDocumentCheckIcon,
+      onClick: () => {},
+    },
+    {
+      label: "Cover Letter",
+      desc: "Generate tailored cover letters.",
+      icon: PencilSquareIcon,
+      onClick: () => {},
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="flex min-h-screen bg-gray-50">
 
-      {/* HEADER */}
-      <div className="max-w-5xl mx-auto mb-8">
-        <h1 className="text-3xl font-bold">
-          Welcome back, <span className="text-blue-600">{auth?.user?.name}</span> 👋
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Manage your job applications and profile easily.
-        </p>
-      </div>
+      {/* LEFT SIDEBAR */}
+      <aside className="w-64 bg-white border-r shadow-sm hidden md:flex flex-col p-6">
+        <div className="flex items-center gap-2 mb-10">
+          <Squares2X2Icon className="w-7 h-7 text-blue-600" />
+          <h1 className="text-xl font-bold">Jobbyfy</h1>
+        </div>
 
-      {/* ACTION CARDS */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <nav className="flex-1">
+          <p className="text-sm text-gray-500 mb-2 px-3">MAIN</p>
+          <ul className="space-y-1">
+            {menu.map((item, i) => (
+              <li key={i}>
+                {item.link ? (
+                  <Link
+                    to={item.link}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg 
+                    hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition"
+                  >
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </Link>
+                ) : (
+                  <button
+                    onClick={item.onClick}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg 
+                    hover:bg-blue-50 text-left text-gray-700 hover:text-blue-600 transition"
+                  >
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-        {/* SCRAPE JOB */}
-        <button
-          onClick={() => {
-            console.log("STEP 1: Scrape button clicked in Dashboard");
-            console.log("STEP 2: Sending SCRAPE_JOB_REQUEST_FROM_DASHBOARD to TOP window");
-
-            window.top.postMessage(
-              { type: "SCRAPE_JOB_REQUEST_FROM_DASHBOARD", source: "DASHBOARD_IFRAME" },
-              "*"
-            );
-          }}
-          className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition"
-        >
-          <h2 className="text-xl font-semibold mb-2">Scrape Current Job</h2>
-          <p className="text-gray-600 mb-3">Extract job details from the current tab.</p>
-          <span className="text-blue-600 font-semibold">→</span>
-        </button>
-
-        {/* AUTO APPLY */}
-        <button className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition">
-          <h2 className="text-xl font-semibold mb-2">Auto Apply</h2>
-          <p className="text-gray-600 mb-3">Automatically fill job applications.</p>
-          <span className="text-blue-600 font-semibold">→</span>
-        </button>
-
-        {/* SAVED JOBS */}
-          <Link
-            to="/jobs"
-            className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition block"
-          >
-            <h2 className="text-xl font-semibold mb-2">Saved Jobs</h2>
-            <p className="text-gray-600 mb-3">View all scraped and saved jobs.</p>
-            <span className="text-blue-600 font-semibold">→</span>
-          </Link>
-
-
-        {/* PROFILE */}
-        <Link
-          to="/profile"
-          className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition block"
-        >
-          <h2 className="text-xl font-semibold mb-2">Profile</h2>
-          <p className="text-gray-600 mb-3">Edit your profile & details.</p>
-          <span className="text-blue-600 font-semibold">→</span>
-        </Link>
-
-        {/* RESUME SCORE */}
-        <button className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition">
-          <h2 className="text-xl font-semibold mb-2">Resume Score</h2>
-          <p className="text-gray-600 mb-3">Check resume match score for job.</p>
-          <span className="text-blue-600 font-semibold">→</span>
-        </button>
-
-        {/* COVER LETTER */}
-        <button className="p-6 bg-white shadow hover:shadow-md rounded-xl border text-left transition">
-          <h2 className="text-xl font-semibold mb-2">Cover Letter</h2>
-          <p className="text-gray-600 mb-3">Generate tailored cover letters.</p>
-          <span className="text-blue-600 font-semibold">→</span>
-        </button>
-
-        {/* LOGOUT */}
         <button
           onClick={logoutUser}
-          className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
+          className="mt-8 flex items-center gap-3 text-red-600 px-3 py-2 rounded-lg 
+          hover:bg-red-50 transition"
         >
+          <ArrowRightOnRectangleIcon className="w-5 h-5" />
           Logout
         </button>
-      </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-6">
+        <header className="max-w-5xl mx-auto mb-10 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-semibold tracking-tight">
+              Welcome back,{" "}
+              <span className="text-blue-600">{auth?.user?.name}</span> 👋
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Manage your job applications and profile easily.
+            </p>
+          </div>
+
+          <button
+            onClick={logoutUser}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow transition md:hidden"
+          >
+            Logout
+          </button>
+        </header>
+
+        {/* FEATURE CARDS */}
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {menu.map((item, i) => {
+            const Wrapper = item.link ? Link : "button";
+            return (
+              <Wrapper
+                key={i}
+                {...(item.link
+                  ? { to: item.link }
+                  : { onClick: item.onClick })}
+                className="group p-6 bg-white border rounded-xl shadow-sm hover:shadow-md transition 
+                hover:-translate-y-1 hover:border-blue-300"
+              >
+                <item.icon className="w-10 h-10 text-blue-600 mb-4 group-hover:scale-110 transition" />
+                <h3 className="text-lg font-semibold mb-1">{item.label}</h3>
+                <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
+                <span className="text-blue-600 font-bold opacity-0 group-hover:opacity-100 transition">
+                  →
+                </span>
+              </Wrapper>
+            );
+          })}
+        </div>
+      </main>
     </div>
   );
 }

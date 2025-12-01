@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { AuthProvider } from "./context/AuthContext";
+import { ProfileProvider } from './context/ProfileContext.jsx';
 
 // Function to mount React into correct root
 function mountReactApp() {
@@ -24,7 +25,9 @@ function mountReactApp() {
   createRoot(rootElement).render(
     <StrictMode>
       <AuthProvider>
-        <App />
+        <ProfileProvider>
+          <App />
+        </ProfileProvider>
       </AuthProvider>
     </StrictMode>
   );
