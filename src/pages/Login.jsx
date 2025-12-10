@@ -10,33 +10,46 @@ export default function Login() {
   const { loginUser } = useAuth();
   const navigate = useNavigate();
 
-  const onSubmit = async (e) => {
+const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const res = await loginApi(form);
+    try {
+      const res = await loginApi(form);
 
-    if (res.token && res.user) {
-      await loginUser({
-        token: res.token,
-        user: res.user,
-      });
+      if (res.token && res.user) {
+        // -----------------------------------------------------------
+        // CRITICAL FIX: Match the "auth" naming convention!
+        // Your Axios Interceptor looks for "auth", so we must save "auth".
+        // -----------------------------------------------------------
+        const authData = { token: res.token, user: res.user };
+        localStorage.setItem("auth", JSON.stringify(authData)); 
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+        // Update Context (this also saves to LS, but the line above guarantees immediate availability)
+        await loginUser(authData);
 
-      const check = await getProfile();
+        // Small delay to ensure state updates
+        await new Promise((resolve) => setTimeout(resolve, 50));
 
-      if (!check.profile) {
-        await createProfile({
-          userId: res.user.userId,
-          name: res.user.name,
-          email: res.user.email,
-        });
+        // Now this request will work because "auth" exists in LocalStorage
+        const check = await getProfile();
+
+        // If profile doesn't exist, create it
+        if (!check || !check.profile) {
+          await createProfile({
+            userId: res.user.userId,
+            name: res.user.name,
+            email: res.user.email,
+          });
+        }
+
+        navigate("/dashboard");
+      } else {
+        alert(res.message || "Invalid credentials");
       }
-
-      navigate("/dashboard");
-    } else {
-      alert(res.message || "Invalid credentials");
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Login failed. Please check your connection.");
     }
 
     setLoading(false);

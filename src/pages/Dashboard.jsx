@@ -18,6 +18,9 @@ export default function Dashboard() {
 
   if (!auth?.token) return <Navigate to="/login" />;
 
+  // ===============================
+  // DASHBOARD MENU ITEMS
+  // ===============================
   const menu = [
     {
       label: "Scrape Current Job",
@@ -33,30 +36,51 @@ export default function Dashboard() {
         );
       },
     },
+
     {
-      label: "Auto Apply",
-      desc: "Automatically fill job applications.",
+      label: "Fill Current Form",
+      desc: "Use AI to auto-fill the form on the current tab.",
       icon: RocketLaunchIcon,
-      onClick: () => {},
+      onClick: () => {
+        window.top.postMessage(
+          {
+            type: "START_FILL_FROM_IFRAME",
+            source: "DASHBOARD_IFRAME",
+            profile: {
+              id: auth?.user?._id,
+              name: auth?.user?.name,
+              email: auth?.user?.email,
+              phone: auth?.user?.phone,
+              token: auth?.token   // <--- add this
+              // add more profile fields if required
+            }
+          },
+          "*"
+        );
+      },
     },
+
     {
       label: "Saved Jobs",
       desc: "View all scraped and saved jobs.",
       icon: BookmarkIcon,
       link: "/jobs",
     },
+
     {
       label: "Profile",
       desc: "Edit your profile & details.",
       icon: UserCircleIcon,
       link: "/profile",
     },
+
     {
       label: "Resume Score",
       desc: "Check match score for your resume.",
       icon: ClipboardDocumentCheckIcon,
       onClick: () => {},
     },
+
     {
       label: "Cover Letter",
       desc: "Generate tailored cover letters.",
@@ -65,9 +89,10 @@ export default function Dashboard() {
     },
   ];
 
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-
+      
       {/* LEFT SIDEBAR */}
       <aside className="w-64 bg-white border-r shadow-sm hidden md:flex flex-col p-6">
         <div className="flex items-center gap-2 mb-10">
@@ -142,9 +167,7 @@ export default function Dashboard() {
             return (
               <Wrapper
                 key={i}
-                {...(item.link
-                  ? { to: item.link }
-                  : { onClick: item.onClick })}
+                {...(item.link ? { to: item.link } : { onClick: item.onClick })}
                 className="group p-6 bg-white border rounded-xl shadow-sm hover:shadow-md transition 
                 hover:-translate-y-1 hover:border-blue-300"
               >

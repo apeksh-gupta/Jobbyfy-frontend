@@ -1,9 +1,10 @@
 import api from "./axiosInstance";
 
-export const compareResume = async (resumeUrl, jobDescription) => {
+// Updated to accept ONLY jobDescription
+export const compareResume = async (jobDescription) => {
   const res = await api.post("/ai/compare-resume", {
-    resumeUrl,
-    jobDescription,
+    // The backend expects exactly this key
+    jobDescription: jobDescription, 
   });
   return res.data;
 };
