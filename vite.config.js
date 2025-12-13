@@ -8,6 +8,8 @@ export default defineConfig({
   plugins: [react() , tailwindcss(),],
   base: '',
   build: {
+    sourcemap: false,       
+    minify: true,     
     outDir: path.resolve(__dirname, '../Jobbyfy extension/sidebar'),
     emptyOutDir: true,
     assetsDir: 'assets',
